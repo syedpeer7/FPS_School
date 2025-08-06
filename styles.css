@@ -169,13 +169,22 @@ body {
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    margin-right: 10px;
     transition: all 0.3s ease;
 }
 
 .download-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+#downloadCsvBtn {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+#downloadCsvBtn:hover {
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
 }
 
 #map {
