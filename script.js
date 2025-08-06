@@ -383,6 +383,73 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async functi
     });
 });
 
+// CSV download handler for FPS-School pairs within 1km
+document.getElementById('downloadCsvBtn').addEventListener('click', function() {
+    if (!distanceData || distanceData.length === 0) {
+        alert('No data available. Please upload a CSV file first.');
+        return;
+    }
+
+    // Filter data for distances less than 1km
+    const nearbyData = distanceData.filter(item => item.distance < 1);
+    
+    if (nearbyData.length === 0) {
+        alert('No FPS-School pairs found within 1km range.');
+        return;
+    }
+
+    // Create CSV headers
+    const headers = [
+        'FPS Shop Name',
+        'School Name', 
+        'Distance (km)',
+        'Travel Time (minutes)',
+        'Mandal',
+        'FPS Latitude',
+        'FPS Longitude',
+        'School Latitude',
+        'School Longitude'
+    ];
+
+    // Create CSV rows
+    const csvRows = [headers.join(',')];
+    
+    nearbyData.forEach(item => {
+        const row = [
+            `"${item.shopNo}"`,
+            `"${item.schoolName}"`,
+            item.distance.toFixed(2),
+            item.time,
+            `"${item.mandal}"`,
+            item.fpsCoords.lat.toFixed(6),
+            item.fpsCoords.lon.toFixed(6),
+            item.schoolCoords.lat.toFixed(6),
+            item.schoolCoords.lon.toFixed(6)
+        ];
+        csvRows.push(row.join(','));
+    });
+
+    // Create and download CSV file
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `FPS_Schools_Within_1km_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show success message
+        alert(`Successfully downloaded ${nearbyData.length} FPS-School pairs within 1km range.`);
+    } else {
+        alert('CSV download not supported in this browser.');
+    }
+});
+
 // Add markers to map with enhanced data
 function addMarkersToMap(mandalData, distances, nearestFPSData) {
     clearMap();
