@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPS & School Road Distance Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛣️ FPS & School Road Distance Dashboard</h1>
+            <p>Upload your CSV data to calculate actual road distances between Fair Price Shops and Schools</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="file-upload" onclick="document.getElementById('csvFile').click()">
+                <input type="file" id="csvFile" accept=".csv" />
+                <div class="file-upload-text">🗂️ Click to Upload CSV File</div>
+                <div class="file-upload-hint">Select your CSV file containing FPS and School data</div>
+            </div>
+        </div>
+
+        <div class="progress-section" id="progressSection">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Calculating road distances...</div>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="main-content">
+                <div class="summary-card">
+                    <div class="summary-header" id="mandalHeader">MANDAL Summary</div>
+                    <button class="download-btn" id="downloadPdfBtn">Download Summary as PDF</button>
+                    <div class="summary-content" id="summaryStats">
+                        <div class="loading">Loading data</div>
+                    </div>
+                </div>
+
+                <div class="map-container">
+                    <div class="map-header">🗺️ Interactive Map with Routes</div>
+                    <div class="controls">
+                        <button class="btn btn-primary" onclick="showAllRoutes()">Show All Routes</button>
+                        <button class="btn btn-secondary" onclick="clearRoutes()">Clear Routes</button>
+                        <button class="btn btn-primary" onclick="showNearestRoutes()">Show Nearest Only</button>
+                    </div>
+                    <div id="map"></div>
+                    <div class="legend">
+                        <h4>Legend</h4>
+                        <div class="legend-item">
+                            <div class="legend-color fps-marker"></div>
+                            <span>Fair Price Shops (MLS)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color school-marker"></div>
+                            <span>Government Schools</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #2ecc71;"></div>
+                            <span>Schools < 1km from nearest FPS</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #e67e22;"></div>
+                            <span>Schools 1-2km from nearest FPS</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #d35400;"></div>
+                            <span>Schools 2-5km from nearest FPS</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #c0392b;"></div>
+                            <span>Schools > 5km from nearest FPS</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color route-line"></div>
+                            <span>Road Routes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 Detailed Distance Data</h3>
+                <div class="table-container">
+                    <table id="distanceTable">
+                        <thead>
+                            <tr>
+                                <th>MLS Shop</th>
+                                <th>School Name</th>
+                                <th>Road Distance (km)</th>
+                                <th>Travel Time</th>
+                                <th>Mandal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="distanceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
