@@ -1,3 +1,137 @@
+// Sample CSV data
+const sampleCSVData = `District name,District code,Mandal name,Mandal code,MLS name,MLS code,shop_no,status,school_id,name_of_the_school,status,FPS Lattitude,FPS Logitude,School Lattitude,School Longitude
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618034,Active,28161800101,MPPS  GC   YANAMALAKUDURU,Active,16.4414356,80.7424707,16.481446,80.665719
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618035,Active,28161800102,MPPS  CB   YANAMALAKUDURU,Active,16.4875467,80.6646034,16.481787,80.676652
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618017,Active,28161800103,MPPS  IR   YANAMALAKUDURU,Active,16.4806576,80.6980281,16.483034,80.67983
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618039,Active,28161800104,RCMPS  YENAMALAKUDURU,Active,16.4814759,80.6668466,#N/A,#N/A
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618016,Active,28161800106,MPPS  MAIN   YENAMALAKDURU,Active,16.4815982,80.7111104,16.484475,80.66208
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618041,Active,28161800109,ZPHS  YANAMALAKUDURU,Active,16.4827956,80.6597911,16.479363,80.665969
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618023,Active,28161800219,MPPS  Urdu   Kanuru,Active,16.4624222,80.7184474,16.508815,80.682123
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618042,Active,28161800301,MPPS  MAIN   PORANKI,Active,16.5004684,80.6901945,16.480052,80.70848
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618015,Active,28161800302,MPPS  S PET   PORANKI,Active,16.4759409,80.6979753,16.477121,80.722891
+Krishna,547,Penamaluru,547018,VUYYURU,2816041,618001,Active,28161800303,CSIPS  PORANKI,Active,16.4813257,80.6693102,#N/A,#N/A`;
+
+// Download sample CSV
+document.getElementById('downloadSampleBtn').addEventListener('click', function() {
+    const blob = new Blob([sampleCSVData], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'Sample_FPS_School_Data.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        alert('Download not supported in this browser.');
+    }
+});
+
+// Preview sample data
+document.getElementById('previewSampleBtn').addEventListener('click', function() {
+    // Create modal for preview
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        border-radius: 15px;
+        max-width: 90%;
+        max-height: 80%;
+        overflow: auto;
+        padding: 30px;
+        position: relative;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    `;
+    
+    // Parse CSV for preview
+    const lines = sampleCSVData.split('\n');
+    const headers = lines[0].split(',');
+    
+    modalContent.innerHTML = `
+        <button onclick="this.parentElement.parentElement.remove()" style="
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        ">×</button>
+        <h2 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">📊 Expected CSV Format Preview</h2>
+        <div style="margin-bottom: 20px; padding: 15px; background: #e8f4fd; border-radius: 8px; border-left: 4px solid #3498db;">
+            <h3 style="color: #2980b9; margin: 0 0 10px 0;">📋 Required Columns:</h3>
+            <div style="font-family: monospace; font-size: 12px; line-height: 1.6;">
+                • <strong>District name, District code</strong> - Administrative divisions<br>
+                • <strong>Mandal name, Mandal code</strong> - Sub-district information<br>
+                • <strong>MLS name, MLS code, shop_no</strong> - Fair Price Shop details<br>
+                • <strong>school_id, name_of_the_school</strong> - School identification<br>
+                • <strong>FPS Lattitude, FPS Logitude</strong> - Fair Price Shop coordinates<br>
+                • <strong>School Lattitude, School Longitude</strong> - School coordinates<br>
+                • <strong>status</strong> - Active/Inactive status for both FPS and schools
+            </div>
+        </div>
+        <div style="overflow-x: auto; border: 1px solid #ddd; border-radius: 8px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background: #34495e; color: white;">
+                        ${headers.map(h => `<th style="padding: 8px; text-align: left; white-space: nowrap;">${h}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${lines.slice(1, 4).map((line, i) => `
+                        <tr style="background: ${i % 2 ? '#f8f9fa' : 'white'};">
+                            ${line.split(',').map(cell => `<td style="padding: 8px; border-bottom: 1px solid #eee; white-space: nowrap;">${cell}</td>`).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 15px; text-align: center; color: #7f8c8d; font-style: italic;">
+            Showing first 3 rows of sample data. Download full sample to see complete format.
+        </div>
+        <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <h4 style="color: #856404; margin: 0 0 10px 0;">⚠️ Important Notes:</h4>
+            <ul style="color: #856404; margin: 0; padding-left: 20px;">
+                <li>Coordinates should be in decimal degrees format</li>
+                <li>Missing coordinates can be marked as #N/A</li>
+                <li>All FPS and School entries should have 'Active' status</li>
+                <li>Shop numbers should be unique identifiers</li>
+            </ul>
+        </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+});
+
 let map;
 let fpsMarkers = [];
 let schoolMarkers = [];
